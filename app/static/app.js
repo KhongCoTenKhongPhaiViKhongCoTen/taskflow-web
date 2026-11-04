@@ -157,9 +157,10 @@
     }
   });
 
-  async function refreshDashboard() {
+  async function refreshDashboard(view = currentView) {
     try {
-      const data = await api("/api/dashboard");
+      const data = await api(`/api/dashboard?view=${encodeURIComponent(view)}`);
+      if (view !== currentView) return;
       ["total", "todo", "doing", "done"].forEach((key) => {
         $(`#stat-${key}`).textContent = data[key];
       });
@@ -419,6 +420,9 @@
 
   function setView(view) {
     currentView = view;
+    document
+      .querySelector(".stats-grid")
+      .classList.toggle("stats-hidden", view === "all");
     const titles = {
       my_day: ["☼", "Ngày của tôi", "Những việc bạn muốn tập trung hôm nay."],
       important: ["☆", "Quan trọng", "Các tác vụ bạn đã đánh dấu quan trọng."],
@@ -436,6 +440,7 @@
         button.classList.toggle("active", button.dataset.view === view),
       );
     quickMyDay = view === "my_day";
+    refreshDashboard(view);
     $("#quick-my-day").classList.toggle("selected", quickMyDay);
     $("#quick-my-day").setAttribute("aria-pressed", String(quickMyDay));
     refreshTasks();

@@ -2088,6 +2088,9 @@ body {
 .topbar-brand.top-brand strong {
     font: inherit;
 }
+.stats-grid.stats-hidden {
+    display: none !important;
+}
 @media (max-width: 1000px) {
     .topbar {
         background: linear-gradient(90deg, #221d39 0 215px, #fff 215px 100%);

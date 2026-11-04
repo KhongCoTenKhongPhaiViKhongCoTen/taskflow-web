@@ -470,8 +470,17 @@ try {
 
     if ($path === "/api/dashboard" && $method === "GET") {
         $user = currentUser($db);
+        $view = $_GET["view"] ?? "all";
+        if (!in_array($view, ["all", "my_day", "important"], true)) {
+            fail(422, "Invalid dashboard view");
+        }
+        $viewCondition = match ($view) {
+            "my_day" => " AND my_day_date = CURRENT_DATE",
+            "important" => " AND is_important = 1",
+            default => "",
+        };
         $statement = $db->prepare(
-            "SELECT status, COUNT(*) AS total FROM tasks WHERE user_id = ? GROUP BY status",
+            "SELECT status, COUNT(*) AS total FROM tasks WHERE user_id = ?{$viewCondition} GROUP BY status",
         );
         $statement->execute([(int) $user["id"]]);
         $counts = ["todo" => 0, "doing" => 0, "done" => 0];
@@ -479,7 +488,7 @@ try {
             $counts[$row["status"]] = (int) $row["total"];
         }
         $statement = $db->prepare(
-            "SELECT COUNT(*) FROM tasks WHERE user_id = ? AND due_date < CURRENT_DATE AND status <> 'done'",
+            "SELECT COUNT(*) FROM tasks WHERE user_id = ?{$viewCondition} AND due_date < CURRENT_DATE AND status <> 'done'",
         );
         $statement->execute([(int) $user["id"]]);
         jsonResponse([

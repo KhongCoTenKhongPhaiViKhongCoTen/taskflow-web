@@ -83,7 +83,7 @@ Trả danh sách task của user hiện tại, sắp xếp hạn gần nhất tr
 
 ## 4.7 Dashboard
 
-`GET /api/dashboard` — cần session.
+`GET /api/dashboard?view=my_day` — cần session. `view` nhận `all`, `my_day` hoặc `important`; các số liệu được tính trong phạm vi view tương ứng (`all` nếu không truyền).
 
 ```json
 { "total": 8, "todo": 3, "doing": 2, "done": 3, "overdue": 1 }
